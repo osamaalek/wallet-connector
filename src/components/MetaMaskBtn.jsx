@@ -3,11 +3,16 @@ import { useWeb3React } from "@web3-react/core";
 import Web3 from "web3";
 
 const MetaMaskBtn = () => {
-  const { isActive, account, connector, chainId } = useWeb3React();
+  const { isActive, account, connector } = useWeb3React();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [metaMaskInstalled, setMetaMaskInstalled] = useState(false);
 
   const myChainId = import.meta.env.MY_CHAIN_ID || "11155111";
+
+  useEffect(() => {
+    setMetaMaskInstalled(!!window.ethereum);
+  }, []);
 
   useEffect(() => {
     const storedActive = localStorage.getItem("walletConnected");
@@ -54,6 +59,13 @@ const MetaMaskBtn = () => {
   };
 
   const onConnectMetaMask = async () => {
+    if (!metaMaskInstalled) {
+      alert("MetaMask is not installed. Please install it to continue")
+      setError({message: "MetaMask is not installed"});
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
